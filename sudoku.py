@@ -1,6 +1,11 @@
 import pygame
 import random
 
+REMOVE_COUNTS = {"Facile": 36, "Moyen": 46, "Difficile": 54}
+DIFFICULTIES = ["Facile", "Moyen", "Difficile"]
+SAVE_FILE = "sudoku_save.json"
+FPS = 30
+
 
 def is_valid(board, idx, val):
     row, col = divmod(idx, 9)
@@ -19,6 +24,7 @@ def shuffle(lst):
     lst = list(lst)
     random.shuffle(lst)
     return lst
+
 
 def solve(board):
     try:
@@ -48,3 +54,22 @@ def count_solutions(board, limit=2):
             if count >= limit:
                 return count
     return count
+
+
+def generate_puzzle(difficulty):
+    full = [0] * 81
+    solve(full)
+    solution = full[:]
+    puzzle = full[:]
+    to_remove = REMOVE_COUNTS[difficulty]
+    removed = 0
+    for idx in shuffle(range(81)):
+        if removed >= to_remove:
+            break
+        backup = puzzle[idx]
+        puzzle[idx] = 0
+        if count_solutions(puzzle[:]) == 1:
+            removed += 1
+        else:
+            puzzle[idx] = backup
+    return puzzle, solution
