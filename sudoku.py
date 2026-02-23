@@ -19,3 +19,32 @@ def shuffle(lst):
     lst = list(lst)
     random.shuffle(lst)
     return lst
+
+def solve(board):
+    try:
+        empty = board.index(0)
+    except ValueError:
+        return True
+    for n in shuffle(range(1, 10)):
+        if is_valid(board, empty, n):
+            board[empty] = n
+            if solve(board):
+                return True
+            board[empty] = 0
+    return False
+
+
+def count_solutions(board, limit=2):
+    try:
+        empty = board.index(0)
+    except ValueError:
+        return 1
+    count = 0
+    for n in range(1, 10):
+        if is_valid(board, empty, n):
+            board[empty] = n
+            count += count_solutions(board, limit)
+            board[empty] = 0
+            if count >= limit:
+                return count
+    return count
