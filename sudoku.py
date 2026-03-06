@@ -455,3 +455,96 @@ class SudokuGame:
 
     def _toggle_notes(self):
         self.note_mode = not self.note_mode
+    def run(self):
+        while True:
+            self.clock.tick(FPS)
+            if self.running_timer:
+                self.elapsed = time.time() - self.start_time
+
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    pygame.quit(); sys.exit()
+
+                elif event.type == pygame.VIDEORESIZE:
+                    if not self.fullscreen:
+                        self.win_w, self.win_h = event.w, event.h
+                        self.screen = pygame.display.set_mode(
+                            (event.w, event.h), pygame.RESIZABLE
+                        )
+                    self._rebuild_layout()
+
+                elif event.type == pygame.KEYDOWN:
+
+                    if event.key == pygame.K_F11:
+                        self.toggle_fullscreen()
+
+                    elif event.key == pygame.K_ESCAPE:
+                        if self.fullscreen:
+                            self.toggle_fullscreen()
+                        else:
+                            pygame.quit(); sys.exit()
+
+                    # ── Saisie numérique ─────────────────────────────────────
+                    # Méthode 1 : touches directes (clavier + pavé numérique)
+                    elif event.key in NUM_KEYS:
+                        self.input_num(NUM_KEYS[event.key])
+
+                    # Méthode 2 : unicode — capture trackpad virtuel, IME,
+                    # claviers internationaux, et tout ce qui génère un car
+                    elif event.unicode in "123456789":
+                        self.input_num(int(event.unicode))
+
+                    elif event.key in (pygame.K_BACKSPACE, pygame.K_DELETE,
+                                       pygame.K_KP0, pygame.K_0):
+                        self.erase_cell()
+
+                    elif event.key == pygame.K_n:
+                        self._toggle_notes()
+                    elif event.key == pygame.K_h:
+                        self.hint()
+                    elif event.key == pygame.K_s:
+                        self.save_game()
+
+                    elif event.key == pygame.K_UP:
+                        if self.selected == -1:
+                            self.selected = 40
+                        elif self.selected >= 9:
+                            self.selected -= 9
+                    elif event.key == pygame.K_DOWN:
+                        if self.selected == -1:
+                            self.selected = 40
+                        elif self.selected < 72:
+                            self.selected += 9
+                    elif event.key == pygame.K_LEFT:
+                        if self.selected == -1:
+                            self.selected = 40
+                        elif self.selected % 9 > 0:
+                            self.selected -= 1
+                    elif event.key == pygame.K_RIGHT:
+                        if self.selected == -1:
+                            self.selected = 40
+                        elif self.selected % 9 < 8:
+                            self.selected += 1
+                    elif event.key == pygame.K_TAB:
+                        self.selected = (self.selected + 1) % 81 if self.selected != -1 else 0
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mx, my = event.pos
+                    BX, BY, C = self.BOARD_X, self.BOARD_Y, self.CELL
+
+                    if BY <= my < BY + self.BOARD_PX and BX <= mx < BX + self.BOARD_PX:
+                        col_c = (mx - BX) // C
+                        row_c = (my - BY) // C
+                        new_sel = row_c * 9 + col_c
+                        self.selected = -1 if new_sel == self.selected else new_sel
+                    else:
+                        for rect, cb in zip(self.btn_rects, self.btn_callbacks):
+                            if rect.collidepoint(mx, my):
+                                cb(); break
+
+            self.draw()
+
+if __name__ == "__main__":
+    game = SudokuGame()
+    game.run()
