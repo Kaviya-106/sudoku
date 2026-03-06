@@ -316,3 +316,34 @@ class SudokuGame:
 
     def _toggle_notes(self):
         self.note_mode = not self.note_mode
+
+# ── Timer ────────────────────────────────────────────────────────────────
+
+    def get_time_str(self):
+        t = int(self.elapsed)
+        return f"{t // 60:02d}:{t % 60:02d}"
+
+    # ── Saisie ───────────────────────────────────────────────────────────────
+
+    def input_num(self, n):
+        if self.selected == -1:
+            self.set_status("Selectionnez d'abord une cellule !", TEXT_MUTED)
+            return
+        if self.given[self.selected]:
+            self.set_status("Cette case est fixe !", TEXT_MUTED)
+            return
+        if self.note_mode and self.board[self.selected] == 0:
+            if n in self.notes[self.selected]:
+                self.notes[self.selected].discard(n)
+            else:
+                self.notes[self.selected].add(n)
+        else:
+            self.board[self.selected] = n
+            self.notes[self.selected].clear()
+        self.check_win()
+
+    def erase_cell(self):
+        if self.selected == -1 or self.given[self.selected]:
+            return
+        self.board[self.selected] = 0
+        self.notes[self.selected].clear()
