@@ -1,6 +1,23 @@
 import pygame
 import random
 
+BG = (15,  15,  15)
+SURFACE = (26,  26,  26)
+CELL_BG = (34,  34,  34)
+CELL_GIVEN = (22,  22,  22)
+BORDER_SOFT = (51,  51,  51)
+BORDER_HARD = (136, 136, 136)
+ACCENT = (232, 201, 122)
+ACCENT2 = (122, 200, 232)
+ERROR_COL = (232, 122, 122)
+SUCCESS_COL = (122, 232, 160)
+NOTE_COL = (110, 110, 110)
+HIGHLIGHT = (30,  30,  40)
+SELECTED_BG = (42,  42,  58)
+SAME_NUM_BG = (30,  36,  32)
+TEXT_MUTED = (100, 100, 100)
+SAVE_COL = (160, 232, 160)
+
 REMOVE_COUNTS = {"Facile": 36, "Moyen": 46, "Difficile": 54}
 DIFFICULTIES = ["Facile", "Moyen", "Difficile"]
 SAVE_FILE = "sudoku_save.json"
@@ -74,6 +91,8 @@ def generate_puzzle(difficulty):
             puzzle[idx] = backup
     return puzzle, solution
 
+# CLass principale pour le Sudoku
+
 
 class SudokuGame:
 
@@ -99,7 +118,7 @@ class SudokuGame:
 
         self._rebuild_lay
 
-def draw(self):
+    def draw(self):
         self.screen.fill(BG)
         self._draw_title()
         self._draw_board()
