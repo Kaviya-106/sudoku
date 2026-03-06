@@ -174,6 +174,127 @@ class SudokuGame:
         self.status_col = TEXT_MUTED
         self.won = False
 
+# ── Timer ────────────────────────────────────────────────────────────────
+
+    def get_time_str(self):
+        t = int(self.elapsed)
+        return f"{t // 60:02d}:{t % 60:02d}"
+
+    # ── Saisie ───────────────────────────────────────────────────────────────
+
+    def input_num(self, n):
+        if self.selected == -1:
+            self.set_status("Selectionnez d'abord une cellule !", TEXT_MUTED)
+            return
+        if self.given[self.selected]:
+            self.set_status("Cette case est fixe !", TEXT_MUTED)
+            return
+        if self.note_mode and self.board[self.selected] == 0:
+            if n in self.notes[self.selected]:
+                self.notes[self.selected].discard(n)
+            else:
+                self.notes[self.selected].add(n)
+        else:
+            self.board[self.selected] = n
+            self.notes[self.selected].clear()
+        self.check_win()
+
+    def erase_cell(self):
+        if self.selected == -1 or self.given[self.selected]:
+            return
+        self.board[self.selected] = 0
+        self.notes[self.selected].clear()
+        
+    def hint(self):
+        candidates = [
+            i for i in range(81)
+            if not self.given[i] and self.board[i] != self.solution[i]
+        ]
+        if not candidates:
+            return
+        idx = random.choice(candidates)
+        self.board[idx] = self.solution[idx]
+        self.notes[idx].clear()
+        self.selected = idx
+        self.hints_used += 1
+        self.set_status(f"Indice utilise ({self.hints_used} total)", ERROR_COL)
+        self.check_win()
+
+    def check_board(self):
+        errors = sum(
+            1 for i in range(81)
+            if self.board[i] != 0 and self.board[i] != self.solution[i]
+        )
+        if errors == 0 and 0 in self.board:
+            self.set_status("Aucune erreur pour l'instant !", ACCENT)
+        elif errors > 0:
+            self.set_status(f"{errors} erreur(s) trouvee(s)", ERROR_COL)
+        else:
+            self.check_win()
+
+    def check_win(self):
+        if 0 not in self.board and all(
+            self.board[i] == self.solution[i] for i in range(81)
+        ):
+            self.running_timer = False
+            self.won = True
+            hint_str = f"avec {self.hints_used} indice(s)" if self.hints_used else""
+            self.set_status(
+                f"Bravo ! Resolu en {self.get_time_str()}{hint_str} !",
+                SUCCESS_COL
+            )
+
+    def set_status(self, msg, col):
+        self.status_msg = msg
+        self.status_col = col
+    
+    def save_game(self):
+        data = {
+            "board":      self.board,
+            "solution":   self.solution,
+            "given":      self.given,
+            "notes":      [list(s) for s in self.notes],
+            "difficulty": self.difficulty,
+            "diff_idx":   self.diff_idx,
+            "elapsed":    int(self.elapsed),
+            "hints_used": self.hints_used,
+            "saved_at":   time.strftime("%d/%m/%Y %H:%M"),
+        }
+        try:
+            with open(SAVE_FILE, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+            self.set_status(f"Sauvegarde ! ({data['saved_at']})", SAVE_COL)
+        except Exception as e:
+            self.set_status(f"Erreur sauvegarde : {e}", ERROR_COL)
+
+    def load_game(self):
+        if not os.path.exists(SAVE_FILE):
+            self.set_status("Aucune sauvegarde trouvee.", TEXT_MUTED)
+            return
+        try:
+            with open(SAVE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.board = data["board"]
+            self.solution = data["solution"]
+            self.given = data["given"]
+            self.notes = [set(s) for s in data["notes"]]
+            self.difficulty = data["difficulty"]
+            self.diff_idx = data["diff_idx"]
+            self.elapsed = data["elapsed"]
+            self.hints_used = data["hints_used"]
+            self.selected = -1
+            self.note_mode = False
+            self.won = False
+            self.running_timer = True
+            self.start_time = time.time() - self.elapsed
+            saved_at = data.get("saved_at", "?")
+            self.set_status(f"Partie du {saved_at} chargee !", SAVE_COL)
+        except Exception as e:
+            self.set_status(f"Erreur chargement : {e}", ERROR_COL)
+
+    def save_exists(self):
+        return os.path.exists(SAVE_FILE)
+    
     def draw(self):
         self.screen.fill(BG)
         self._draw_title()
@@ -316,34 +437,3 @@ class SudokuGame:
 
     def _toggle_notes(self):
         self.note_mode = not self.note_mode
-
-# ── Timer ────────────────────────────────────────────────────────────────
-
-    def get_time_str(self):
-        t = int(self.elapsed)
-        return f"{t // 60:02d}:{t % 60:02d}"
-
-    # ── Saisie ───────────────────────────────────────────────────────────────
-
-    def input_num(self, n):
-        if self.selected == -1:
-            self.set_status("Selectionnez d'abord une cellule !", TEXT_MUTED)
-            return
-        if self.given[self.selected]:
-            self.set_status("Cette case est fixe !", TEXT_MUTED)
-            return
-        if self.note_mode and self.board[self.selected] == 0:
-            if n in self.notes[self.selected]:
-                self.notes[self.selected].discard(n)
-            else:
-                self.notes[self.selected].add(n)
-        else:
-            self.board[self.selected] = n
-            self.notes[self.selected].clear()
-        self.check_win()
-
-    def erase_cell(self):
-        if self.selected == -1 or self.given[self.selected]:
-            return
-        self.board[self.selected] = 0
-        self.notes[self.selected].clear()
