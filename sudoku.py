@@ -1,11 +1,41 @@
 import pygame
 import random
+import sys
+import time
+import json
+import os
+
+BG = (15,  15,  15)
+SURFACE = (26,  26,  26)
+CELL_BG = (34,  34,  34)
+CELL_GIVEN = (22,  22,  22)
+BORDER_SOFT = (51,  51,  51)
+BORDER_HARD = (136, 136, 136)
+ACCENT = (232, 201, 122)
+ACCENT2 = (122, 200, 232)
+ERROR_COL = (232, 122, 122)
+SUCCESS_COL = (122, 232, 160)
+NOTE_COL = (110, 110, 110)
+HIGHLIGHT = (30,  30,  40)
+SELECTED_BG = (42,  42,  58)
+SAME_NUM_BG = (30,  36,  32)
+TEXT_MUTED = (100, 100, 100)
+SAVE_COL = (160, 232, 160)
 
 REMOVE_COUNTS = {"Facile": 36, "Moyen": 46, "Difficile": 54}
 DIFFICULTIES = ["Facile", "Moyen", "Difficile"]
 SAVE_FILE = "sudoku_save.json"
 FPS = 30
 
+# Les chiffres pour tous les types de pavés
+NUM_KEYS = {
+    pygame.K_1: 1, pygame.K_2: 2, pygame.K_3: 3,
+    pygame.K_4: 4, pygame.K_5: 5, pygame.K_6: 6,
+    pygame.K_7: 7, pygame.K_8: 8, pygame.K_9: 9,
+    pygame.K_KP1: 1, pygame.K_KP2: 2, pygame.K_KP3: 3,
+    pygame.K_KP4: 4, pygame.K_KP5: 5, pygame.K_KP6: 6,
+    pygame.K_KP7: 7, pygame.K_KP8: 8, pygame.K_KP9: 9,
+}
 
 def is_valid(board, idx, val):
     row, col = divmod(idx, 9)
@@ -97,9 +127,54 @@ class SudokuGame:
         self.btn_rects = []
         self.btn_callbacks = []
 
-        self._rebuild_lay
+        self._rebuild_layout()
+        self.new_game()
+    
+    def _rebuild_layout(self):
+        W, H = self.screen.get_size()
 
-def draw(self):
+        margin = int(min(W, H) * 0.04)
+        ui_h = int(H * 0.24)
+        title_h = int(H * 0.10)
+
+        available = H - title_h - ui_h - margin * 2
+        board_px = min(W - margin * 2, available)
+        board_px = (board_px // 9) * 9
+
+        self.BOARD_PX = board_px
+        self.CELL = board_px // 9
+        self.BOARD_X = (W - board_px) // 2
+        self.BOARD_Y = title_h + margin
+        self.UI_Y = self.BOARD_Y + board_px + margin
+        self.W, self.H = W, H
+
+        fs_title = max(16, int(H * 0.055))
+        fs_cell = max(12, int(self.CELL * 0.52))
+        fs_note = max(7,  int(self.CELL * 0.18))
+        fs_ui = max(10, int(H * 0.022))
+        fs_small = max(9,  int(H * 0.018))
+
+        self.font_title = pygame.font.SysFont("Georgia", fs_title, bold=True)
+        self.font_cell = pygame.font.SysFont("Courier New", fs_cell, bold=True)
+        self.font_note = pygame.font.SysFont("Courier New", fs_note)
+        self.font_ui = pygame.font.SysFont("Courier New", fs_ui)
+        self.font_small = pygame.font.SysFont("Courier New", fs_small)
+        
+    def new_game(self):
+        self.board, self.solution = generate_puzzle(self.difficulty)
+        self.given = [v != 0 for v in self.board]
+        self.notes = [set() for _ in range(81)]
+        self.selected = -1
+        self.note_mode = False
+        self.hints_used = 0
+        self.start_time = time.time()
+        self.elapsed = 0
+        self.running_timer = True
+        self.status_msg = ""
+        self.status_col = TEXT_MUTED
+        self.won = False
+
+    def draw(self):
         self.screen.fill(BG)
         self._draw_title()
         self._draw_board()
