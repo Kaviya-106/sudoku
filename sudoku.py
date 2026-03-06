@@ -98,3 +98,146 @@ class SudokuGame:
         self.btn_callbacks = []
 
         self._rebuild_lay
+
+def draw(self):
+        self.screen.fill(BG)
+        self._draw_title()
+        self._draw_board()
+        self._draw_ui()
+        pygame.display.flip()
+
+    def _draw_title(self):
+        W, H = self.W, self.H
+        title = self.font_title.render("SUDOKU", True, ACCENT)
+        self.screen.blit(title, (W//2 - title.get_width() // 2, int(H*0.012)))
+        sub = self.font_small.render("PUZZLE CLASSIQUE", True, TEXT_MUTED)
+        self.screen.blit(sub, (W // 2 - sub.get_width() // 2, int(H * 0.065)))
+
+    def _draw_board(self):
+        BX, BY, C = self.BOARD_X, self.BOARD_Y, self.CELL
+
+        for i in range(81):
+            row, col = divmod(i, 9)
+            x = BX + col * C
+            y = BY + row * C
+
+            if i == self.selected:
+                color = SELECTED_BG
+            elif self.selected != -1:
+                sr, sc = divmod(self.selected, 9)
+                sb = (sr // 3) * 3 + sc // 3
+                cb = (row // 3) * 3 + col // 3
+                if row == sr or col == sc or sb == cb:
+                    color = HIGHLIGHT
+                elif self.board[self.selected] != 0 and self.board[i] == self.board[self.selected]:
+                    color = SAME_NUM_BG
+                else:
+                    color = CELL_GIVEN if self.given[i] else CELL_BG
+            else:
+                color = CELL_GIVEN if self.given[i] else CELL_BG
+
+            pygame.draw.rect(self.screen, color, (x, y, C, C))
+
+            val = self.board[i]
+            if val != 0:
+                is_err = not self.given[i] and val != self.solution[i]
+                txt_col = ERROR_COL if is_err else (ACCENT if not self.given[i] else ACCENT2)
+                surf = self.font_cell.render(str(val), True, txt_col)
+                self.screen.blit(surf, (
+                    x + C // 2 - surf.get_width() // 2,
+                    y + C // 2 - surf.get_height() // 2
+                ))
+            elif self.notes[i]:
+                nc_s = C // 3
+                for n in range(1, 10):
+                    if n in self.notes[i]:
+                        nr, nc = divmod(n - 1, 3)
+                        ns = self.font_note.render(str(n), True, NOTE_COL)
+                        self.screen.blit(ns, (
+                            x + nc * nc_s + max(2, nc_s // 5),
+                            y + nr * nc_s + max(1, nc_s // 6)
+                        ))
+
+        BP = self.BOARD_PX
+        for i in range(10):
+            thick = max(2, C // 18) if i % 3 == 0 else 1
+            col_v = BORDER_HARD if i % 3 == 0 else BORDER_SOFT
+            pygame.draw.line(self.screen, col_v, (BX + i * C, BY), (BX + i * C, BY + BP), thick)
+            pygame.draw.line(self.screen, col_v, (BX, BY + i * C), (BX + BP, BY + i * C), thick)
+
+    def _draw_ui(self):
+        W, UI_Y, H = self.W, self.UI_Y, self.H
+
+        ts = self.font_ui.render(self.get_time_str(), True, TEXT_MUTED)
+        self.screen.blit(ts, (W // 2 - ts.get_width() // 2, UI_Y - int(H * 0.032)))
+
+        buttons = [
+            (f"< {self.difficulty} >", self._btn_diff),
+            ("NOUVELLE PARTIE",         self.new_game),
+            (f"NOTES {'ON' if self.note_mode else 'OFF'}", self._toggle_notes),
+            ("INDICE  [H]",             self.hint),
+            ("EFFACER",                 self.erase_cell),
+            ("VERIFIER",                self.check_board),
+            ("SAUVEGARDER  [S]",        self.save_game),
+            ("CHARGER PARTIE",          self.load_game),
+            ("PLEIN ECRAN  [F11]",      self.toggle_fullscreen),
+        ]
+
+        per_row = 3
+        total_w = W - int(W * 0.06)
+        btn_w = (total_w - (per_row - 1) * int(W * 0.015)) // per_row
+        btn_h = max(24, int(H * 0.038))
+        start_x = int(W * 0.03)
+        gap_x = int(W * 0.015)
+        gap_y = int(H * 0.010)
+
+        self.btn_rects = []
+        self.btn_callbacks = []
+
+        for i, (label, cb) in enumerate(buttons):
+            row_i, col_i = divmod(i, per_row)
+            bx = start_x + col_i * (btn_w + gap_x)
+            by = UI_Y + row_i * (btn_h + gap_y)
+            rect = pygame.Rect(bx, by, btn_w, btn_h)
+            self.btn_rects.append(rect)
+            self.btn_callbacks.append(cb)
+
+            is_note = (i == 2)
+            is_save = (i == 6)
+            is_load = (i == 7)
+
+            if is_note and self.note_mode:
+                border, txt = ACCENT2, ACCENT2
+            elif is_save:
+                border, txt = SAVE_COL, SAVE_COL
+            elif is_load:
+                has_save = self.save_exists()
+                border = SAVE_COL if has_save else BORDER_SOFT
+                txt = SAVE_COL if has_save else TEXT_MUTED
+            else:
+                border, txt = BORDER_SOFT, ACCENT
+
+            pygame.draw.rect(self.screen, SURFACE, rect)
+            pygame.draw.rect(self.screen, border, rect, 1)
+
+            lbl = self.font_small.render(label, True, txt)
+            if lbl.get_width() > btn_w - 8:
+                f2 = pygame.font.SysFont("Courier New", max(7, self.font_small.size(" ")[1] - 2))
+                lbl = f2.render(label, True, txt)
+
+            self.screen.blit(lbl, (
+                rect.centerx - lbl.get_width() // 2,
+                rect.centery - lbl.get_height() // 2
+            ))
+
+        if self.status_msg:
+            sm = self.font_small.render(self.status_msg, True, self.status_col)
+            rows = (len(buttons) + per_row - 1) // per_row
+            sy = UI_Y + rows * (btn_h + gap_y) + int(H * 0.008)
+            self.screen.blit(sm, (W // 2 - sm.get_width() // 2, sy))
+
+    def _btn_diff(self):
+        self.cycle_difficulty()
+
+    def _toggle_notes(self):
+        self.note_mode = not self.note_mode
