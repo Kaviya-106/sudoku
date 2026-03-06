@@ -37,6 +37,7 @@ NUM_KEYS = {
     pygame.K_KP7: 7, pygame.K_KP8: 8, pygame.K_KP9: 9,
 }
 
+
 def is_valid(board, idx, val):
     row, col = divmod(idx, 9)
     br, bc = (row // 3) * 3, (col // 3) * 3
