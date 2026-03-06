@@ -73,3 +73,28 @@ def generate_puzzle(difficulty):
         else:
             puzzle[idx] = backup
     return puzzle, solution
+
+
+class SudokuGame:
+
+    def __init__(self):
+        pygame.init()
+        pygame.display.set_caption("SUDOKU")
+
+        info = pygame.display.Info()
+        self.screen_w = info.current_w
+        self.screen_h = info.current_h
+        self.fullscreen = False
+
+        self.win_w = int(self.screen_w * 0.9)
+        self.win_h = int(self.screen_h * 0.9)
+        self.screen = pygame.display.set_mode(
+            (self.win_w, self.win_h), pygame.RESIZABLE
+        )
+        self.clock = pygame.time.Clock()
+        self.difficulty = "Moyen"
+        self.diff_idx = 1
+        self.btn_rects = []
+        self.btn_callbacks = []
+
+        self._rebuild_lay
