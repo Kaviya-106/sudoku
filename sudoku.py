@@ -295,6 +295,24 @@ class SudokuGame:
     def save_exists(self):
         return os.path.exists(SAVE_FILE)
     
+     # ── Difficulté ───────────────────────────────────────────────────────────
+
+    def cycle_difficulty(self):
+        self.diff_idx = (self.diff_idx + 1) % len(DIFFICULTIES)
+        self.difficulty = DIFFICULTIES[self.diff_idx]
+
+    # ── Plein écran ──────────────────────────────────────────────────────────
+
+    def toggle_fullscreen(self):
+        self.fullscreen = not self.fullscreen
+        if self.fullscreen:
+            self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            self.screen = pygame.display.set_mode(
+                (self.win_w, self.win_h), pygame.RESIZABLE
+            )
+        self._rebuild_layout()
+    
     def draw(self):
         self.screen.fill(BG)
         self._draw_title()
