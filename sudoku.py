@@ -456,6 +456,7 @@ class SudokuGame:
 
     def _toggle_notes(self):
         self.note_mode = not self.note_mode
+
     def run(self):
         while True:
             self.clock.tick(FPS)
