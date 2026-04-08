@@ -48,8 +48,8 @@ boutton_quitter.grid(row=3, column=0)
 canva=tk.Canvas(fenetre, width=500, height=500, background="white")
 canva.grid(row=0, column=0, rowspan=3)
 
-nombre_ligne=9
-nombre_colonne=9
+nombre_ligne=11
+nombre_colonne=11
 taille=500/nombre_colonne
 for ligne in range(1, nombre_ligne-1):
     for colonne in range(1, nombre_colonne-1):
