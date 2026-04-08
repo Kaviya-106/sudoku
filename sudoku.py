@@ -35,13 +35,16 @@ def affichage_chiffre (event):
 
 def remplir_chiffre (nombre):
     global taille, canva, x_ecran, y_ecran, grille, text_canva
-    ligne=x_ecran//taille-1
-    colonne=y_ecran//taille-1
+    ligne = int(x_ecran//taille)-1
+    colonne = int(y_ecran//taille)-1
+    grille[ligne][colonne] = int(nombre)
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
     x2 = x1 + taille//2
     y2 = y1 + taille//2
-    text_canva[(ligne, colonne)]= canva.create_text(x2, y2, text=nombre, font=( 12) )
+    if (ligne, colonne) in text_canva:
+        canva.delete(text_canva[(ligne, colonne)])
+    text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12))
     
 
 
