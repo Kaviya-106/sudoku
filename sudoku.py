@@ -6,6 +6,9 @@ def fermer_fenetre ():
     fenetre.destroy()
 
 
+text_canva={}
+grille=[[0]*9 for _ in range (9)]
+
 x_sauv=0
 y_sauv=0
 x_ecran=0
@@ -31,14 +34,14 @@ def affichage_chiffre (event):
     roue_chifffre.tk_popup(x_sauv, y_sauv)
 
 def remplir_chiffre (nombre):
-    global taille, canva, x_ecran, y_ecran
-    ligne=x_ecran//taille
-    colonne=y_ecran//taille
-    x1 = ligne * taille
-    y1 = colonne * taille
+    global taille, canva, x_ecran, y_ecran, grille, text_canva
+    ligne=x_ecran//taille-1
+    colonne=y_ecran//taille-1
+    x1 = (ligne+1) * taille
+    y1 = (colonne+1) * taille
     x2 = x1 + taille//2
     y2 = y1 + taille//2
-    canva.create_text(x2, y2, text=nombre, font=( 12) )  
+    text_canva[(ligne, colonne)]= canva.create_text(x2, y2, text=nombre, font=( 12) )
     
 
 
