@@ -45,8 +45,11 @@ l=tri_min([1,2,5,6,7,3])
 print(ajouter_trie(l, 4))
 
 def deplacer (liste, valeur):
-    for i in liste:
-        if i<valeur:
-            i=valeur
+    pos = 0  # là où on doit mettre le prochain élément < valeur
+    for i in range(len(liste)):
+        if liste[i] < valeur:
+            liste[pos], liste[i] = liste[i], liste[pos]
+            pos += 1
     return liste
+# -> [1, 2, 2, 3, 4, 5, 9, 8]  (ou une variante proche)
 print(deplacer([1,2,5,2,3,4,9,8],5))
