@@ -1,5 +1,7 @@
 import tkinter as tk
 import random
+import copy
+
 fenetre=tk.Tk()
 fenetre.title("jeu soudoku")
 
@@ -14,7 +16,7 @@ x_sauv=0
 y_sauv=0
 x_ecran=0
 y_ecran=0
-
+grille_sol=[]
 
 def est_possible(grille, lig, col, nombre):
     if nombre in grille[lig]:
@@ -45,20 +47,39 @@ def remplir_grille(grille):
                 return False
     return True
 
+def disparition_chiffres(grille, nb_trous=40):
+    cases = [(lig, col) for lig in range(9) for col in range(9)]
+    random.shuffle(cases)
+    for lig, col in cases[:nb_trous]:
+        grille[lig][col] = None
 
 def generer_grille():
-    global grille, text_canva, x_ecran, y_ecran
+    global grille, text_canva, x_ecran, y_ecran, grille_sol
     remplir_grille(grille)
+    grille_sol=copy.deepcopy(grille)
+    disparition_chiffres(grille)
     for lig in range(9):
         for col in range(9):
             x = (lig + 1.5) * taille
             y = (col + 1.5) * taille
+            if grille[lig][col] is not None:
+                x1 = (lig+1)*taille
+                y1 = (col+1)*taille
+                canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
             text_canva[(lig, col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 def affichage_chiffre (event):
     global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran, entry
     y_ecran=event.y
     x_ecran=event.x
+    ligne = int(x_ecran//taille)-1
+    colonne = int(y_ecran//taille)-1
+    if (ligne, colonne) in text_canva:
+        couleur = canva.itemcget(text_canva[(ligne, colonne)], "fill")
+        if couleur == "green":
+            return
+    elif grille[ligne][colonne] is not None:
+        return
     entry= tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white",font=("Arial", 12), justify="center")
     x=(event.x//taille)*taille+taille//2
     y=(event.y//taille)*taille+taille//2
@@ -72,17 +93,21 @@ def valider_chiffre (event):
     entry.destroy()
 
 def remplir_chiffre (nombre):
-    global taille, canva, x_ecran, y_ecran, grille, text_canva
+    global taille, canva, x_ecran, y_ecran, grille, text_canva, grille_sol
     ligne = int(x_ecran//taille)-1
-    colonne = int(y_ecran//taille)-1
+    colonne = int(y_ecran//taille)-1 
     grille[ligne][colonne] = int(nombre)
+    if grille[ligne][colonne] == grille_sol[ligne][colonne]:
+        color = "green"
+    else:
+        color = "red"
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
     x2 = x1 + taille//2
     y2 = y1 + taille//2
     if (ligne, colonne) in text_canva:
         canva.delete(text_canva[(ligne, colonne)])
-    text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12))
+    text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12), fill=color)
     
 
 
