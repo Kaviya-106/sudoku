@@ -1,4 +1,5 @@
-import tkinter as tk 
+import tkinter as tk
+import random
 fenetre=tk.Tk()
 fenetre.title("jeu soudoku")
 
@@ -14,6 +15,45 @@ y_sauv=0
 x_ecran=0
 y_ecran=0
 
+
+def est_possible(grille, lig, col, nombre):
+    if nombre in grille[lig]:
+        return False
+    if nombre in [grille[i][col] for i in range(9)]:
+        return False
+    lig0 = (lig // 3) * 3
+    col0 = (col // 3) * 3
+    for i in range(3):
+        for j in range(3):
+            if grille[lig0+i][col0+j] == nombre:
+                return False
+    return True
+
+
+def remplir_grille(grille):
+    for lig in range(9):
+        for col in range(9):
+            if grille[lig][col] == 0:
+                nombres = list(range(1, 10))
+                random.shuffle(nombres)
+                for nombre in nombres:
+                    if est_possible(grille, lig, col, nombre):
+                        grille[lig][col] = nombre
+                        if remplir_grille(grille):
+                            return True
+                        grille[lig][col] = 0
+                return False
+    return True
+
+
+def generer_grille():
+    global grille, text_canva, x_ecran, y_ecran
+    remplir_grille(grille)
+    for lig in range(9):
+        for col in range(9):
+            x = (lig + 1.5) * taille
+            y = (col + 1.5) * taille
+            text_canva[(lig, col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 def affichage_chiffre (event):
     global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran, entry
@@ -62,5 +102,5 @@ for ligne in range(1, nombre_ligne-1):
         canva.create_rectangle(x1,y1, x1+taille, y1+taille)
 
 canva.bind("<Button-1>", affichage_chiffre)
-
+generer_grille()
 fenetre.mainloop()
