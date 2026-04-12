@@ -16,22 +16,20 @@ y_ecran=0
 
 
 def affichage_chiffre (event):
-    global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran
+    global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran, entry
     y_ecran=event.y
     x_ecran=event.x
-    x_sauv=canva.winfo_rootx()+ event.x
-    y_sauv=canva.winfo_rooty()+ event.y
-    roue_chifffre= tk.Menu(fenetre, tearoff=0)
-    roue_chifffre.add_command(label="1",command= lambda: remplir_chiffre("1"))
-    roue_chifffre.add_command(label="2",command= lambda: remplir_chiffre("2"))
-    roue_chifffre.add_command(label="3",command= lambda: remplir_chiffre("3"))
-    roue_chifffre.add_command(label="4",command= lambda: remplir_chiffre("4"))
-    roue_chifffre.add_command(label="5",command= lambda: remplir_chiffre("5"))
-    roue_chifffre.add_command(label="6",command= lambda: remplir_chiffre("6"))
-    roue_chifffre.add_command(label="7",command= lambda: remplir_chiffre("7"))
-    roue_chifffre.add_command(label="8",command= lambda: remplir_chiffre("8"))
-    roue_chifffre.add_command(label="9",command= lambda: remplir_chiffre("9"))
-    roue_chifffre.tk_popup(x_sauv, y_sauv)
+    entry= tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white",font=("Arial", 12), justify="center")
+    x=(event.x//taille)*taille+taille//2
+    y=(event.y//taille)*taille+taille//2
+    canva.create_window(x, y, window=entry,width=taille-2, height=taille-2)
+    entry.focus()
+    entry.bind("<Return>", valider_chiffre)
+ 
+def valider_chiffre (event):
+    global entry
+    remplir_chiffre(entry.get())
+    entry.destroy()
 
 def remplir_chiffre (nombre):
     global taille, canva, x_ecran, y_ecran, grille, text_canva
