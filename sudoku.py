@@ -66,7 +66,7 @@ def generer_grille():
                 x1 = (lig+1)*taille
                 y1 = (col+1)*taille
                 canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
-            text_canva[(lig, col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
+            text_canva[(lig-1, col-1)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 def affichage_chiffre (event):
     global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran, entry
