@@ -113,6 +113,43 @@ def remplir_chiffre(nombre):
         canva.delete(text_canva[(ligne, colonne)])
     text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12), fill=color)
 
+secondes = 0
+label_chrono = None
+
+def maj_chrono():
+    global secondes, label_chrono
+    secondes += 1
+    m, s = divmod(secondes, 60)
+    label_chrono.config(text=f"Temps : {m:02d}:{s:02d}")
+    label_chrono.after(1000, maj_chrono)
+
+def donner_indice():
+    global grille, grille_sol, text_canva, taille, canva
+    vides = [(r, c) for r in range(9) for c in range(9) if grille[r][c] is None or grille[r][c] != grille_sol[r][c]] 
+    if vides:
+        l, c = random.choice(vides)
+        grille[l][c] = grille_sol[l][c]
+        x, y = (l + 1.5) * taille, (c + 1.5) * taille
+        if (l, c) in text_canva: canva.delete(text_canva[(l, c)])
+        text_canva[(l, c)] = canva.create_text(x, y, text=grille[l][c], font=(12), fill="blue")
+
+def sauvegarder():
+    
+    with open("save.txt", "w") as f :
+        for ligne in grille:
+            f.write(str(ligne) + "\n")
+    messagebox.showinfo("Sauvegarde", "Partie enregistrée dans save.txt")
+
+def annuler_partie():
+    
+    global grille, grille_depart, text_canva
+    if messagebox.askyesno("Reset", "Voulez-vous effacer vos réponses ?"):
+        for (l, c), txt_id in list(text_canva.items()):
+            # On n'efface que si la case était vide au début du jeu
+            if grille_depart[l+1][c+1] is None: 
+                canva.delete(txt_id)
+                del text_canva[(l, c)]
+                grille[l][c] = None
 
 fenetre = tk.Tk()
 fenetre.title("jeu soudoku")
