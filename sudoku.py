@@ -1,4 +1,5 @@
-import tkinter as tk
+import tkinter as tk 
+from tkinter import messagebox
 import random
 import copy
 
@@ -15,6 +16,7 @@ y_sauv = 0
 x_ecran = 0
 y_ecran = 0
 grille_sol = []
+grille_depart = []
 
 
 def est_possible(grille, lig, col, nombre):
@@ -59,15 +61,16 @@ def generer_grille():
     remplir_grille(grille)
     grille_sol = copy.deepcopy(grille)
     disparition_chiffres(grille)
+    grille_depart = copy.deepcopy(grille)
     for lig in range(9):
         for col in range(9):
-            x = (lig + 1.5) * taille
-            y = (col + 1.5) * taille
+            x = (col + 1.5) * taille
+            y = (lig + 1.5) * taille
             if grille[lig][col] is not None:
-                x1 = (lig+1)*taille
-                y1 = (col+1)*taille
+                x1 = (col+1)*taille
+                y1 = (lig+1)*taille
                 canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
-            text_canva[(lig-1, col-1)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
+            text_canva[(lig , col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 
 def affichage_chiffre(event):
@@ -80,7 +83,7 @@ def affichage_chiffre(event):
         couleur = canva.itemcget(text_canva[(ligne, colonne)], "fill")
         if couleur == "green":
             return
-    elif grille[ligne][colonne] is not None:
+    if grille[ligne][colonne] is not None:
         return
     entry = tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white", font=("Arial", 12), justify="center")
     x = (event.x//taille)*taille+taille//2
@@ -129,9 +132,9 @@ def donner_indice():
     if vides:
         l, c = random.choice(vides)
         grille[l][c] = grille_sol[l][c]
-        x, y = (l + 1.5) * taille, (c + 1.5) * taille
-        if (l, c) in text_canva: canva.delete(text_canva[(l, c)])
-        text_canva[(l, c)] = canva.create_text(x, y, text=grille[l][c], font=(12), fill="blue")
+        y, x= (c -1 + 1.5) * taille, (l -1 + 1.5) * taille
+        if (l , c ) in text_canva: canva.delete(text_canva[(l , c )])
+        text_canva[(l , c )] = canva.create_text(x, y, text=grille[l][c], font=(12), fill="blue")
 
 def sauvegarder():
     
@@ -146,7 +149,7 @@ def annuler_partie():
     if messagebox.askyesno("Reset", "Voulez-vous effacer vos réponses ?"):
         for (l, c), txt_id in list(text_canva.items()):
             # On n'efface que si la case était vide au début du jeu
-            if grille_depart[l+1][c+1] is None: 
+            if grille_depart[l][c] is None: 
                 canva.delete(txt_id)
                 del text_canva[(l, c)]
                 grille[l][c] = None
@@ -171,4 +174,11 @@ for ligne in range(1, nombre_ligne-1):
 
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
+
+tk.Button(fenetre, text="Indice", command=donner_indice).grid(row=3, column=1)
+tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=3, column=2)
+tk.Button(fenetre, text="Recommencer", command=annuler_partie).grid(row=3, column=3)
+label_chrono = tk.Label(fenetre, text="Temps : 00:00", font=("Arial",12) )
+label_chrono.grid(row=4, column=0)
+maj_chrono()
 fenetre.mainloop()
