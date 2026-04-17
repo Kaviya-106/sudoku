@@ -57,7 +57,7 @@ def disparition_chiffres(grille, nb_trous=40):
 
 
 def generer_grille():
-    global grille, text_canva, x_ecran, y_ecran, grille_sol
+    global grille, text_canva, x_ecran, y_ecran, grille_sol, grille_depart
     remplir_grille(grille)
     grille_sol = copy.deepcopy(grille)
     disparition_chiffres(grille)
@@ -134,8 +134,9 @@ def sauvegarder():
         for ligne in grille:
             f.write(str(ligne) + "\n")
     messagebox.showinfo("Sauvegarde", "Partie enregistrée dans save.txt")
+    btn_charger.entryconfig(state="normal")
 
-def annuler_partie():
+def annuler_reponse():
     
     global grille, grille_depart, text_canva
     if messagebox.askyesno("Reset", "Voulez-vous effacer vos réponses ?"):
@@ -145,6 +146,12 @@ def annuler_partie():
                 canva.delete(txt_id)
                 del text_canva[(l, c)]
                 grille[l][c] = None
+
+def charger_sauvegarde():
+
+    global grille
+    with open("save.txt", "r") as f:
+        grille = [eval(ligne.strip()) for ligne in f ]
 
 fenetre = tk.Tk()
 fenetre.title("jeu soudoku")
@@ -167,9 +174,10 @@ for ligne in range(1, nombre_ligne-1):
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
 
-
+btn_charger=tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="disabled")
+btn_charger.grid(row=3, column=1)
 tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=3, column=2)
-tk.Button(fenetre, text="Recommencer", command=annuler_partie).grid(row=3, column=3)
+tk.Button(fenetre, text="Recommencer", command=annuler_reponse).grid(row=3, column=3)
 label_chrono = tk.Label(fenetre, text="Temps : 00:00", font=("Arial",12) )
 label_chrono.grid(row=4, column=0)
 maj_chrono()
