@@ -64,11 +64,11 @@ def generer_grille():
     grille_depart = copy.deepcopy(grille)
     for lig in range(9):
         for col in range(9):
-            x = (col + 1.5) * taille
-            y = (lig + 1.5) * taille
+            x = (lig + 1.5) * taille
+            y = (col + 1.5) * taille
             if grille[lig][col] is not None:
-                x1 = (col+1)*taille
-                y1 = (lig+1)*taille
+                x1 = (lig+1)*taille
+                y1 = (col+1)*taille
                 canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
             text_canva[(lig , col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
@@ -126,15 +126,7 @@ def maj_chrono():
     label_chrono.config(text=f"Temps : {m:02d}:{s:02d}")
     label_chrono.after(1000, maj_chrono)
 
-def donner_indice():
-    global grille, grille_sol, text_canva, taille, canva
-    vides = [(r, c) for r in range(9) for c in range(9) if grille[r][c] is None or grille[r][c] != grille_sol[r][c]] 
-    if vides:
-        l, c = random.choice(vides)
-        grille[l][c] = grille_sol[l][c]
-        y, x= (c -1 + 1.5) * taille, (l -1 + 1.5) * taille
-        if (l , c ) in text_canva: canva.delete(text_canva[(l , c )])
-        text_canva[(l , c )] = canva.create_text(x, y, text=grille[l][c], font=(12), fill="blue")
+
 
 def sauvegarder():
     
@@ -175,7 +167,7 @@ for ligne in range(1, nombre_ligne-1):
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
 
-tk.Button(fenetre, text="Indice", command=donner_indice).grid(row=3, column=1)
+
 tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=3, column=2)
 tk.Button(fenetre, text="Recommencer", command=annuler_partie).grid(row=3, column=3)
 label_chrono = tk.Label(fenetre, text="Temps : 00:00", font=("Arial",12) )
