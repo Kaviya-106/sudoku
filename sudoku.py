@@ -17,6 +17,7 @@ x_ecran = 0
 y_ecran = 0
 grille_sol = []
 grille_depart = []
+btn_charger=None
 
 
 def est_possible(grille, lig, col, nombre):
@@ -130,6 +131,7 @@ def maj_chrono():
 
 def sauvegarder():
     
+    global btn_charger 
     with open("save.txt", "w") as f :
         for ligne in grille:
             f.write(str(ligne) + "\n")
@@ -174,7 +176,7 @@ for ligne in range(1, nombre_ligne-1):
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
 
-btn_charger=tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="disabled")
+btn_charger=tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal")
 btn_charger.grid(row=3, column=1)
 tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=3, column=2)
 tk.Button(fenetre, text="Recommencer", command=annuler_reponse).grid(row=3, column=3)
