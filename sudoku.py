@@ -76,7 +76,8 @@ def generer_grille():
 
 def affichage_chiffre(event):
     global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran, entry
-    y_ecran = event.y
+    #recup les event pour remplir_chiffre
+    y_ecran = event.y                                               
     x_ecran = event.x
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
@@ -86,8 +87,10 @@ def affichage_chiffre(event):
             return
     if grille[ligne][colonne] is not None:
         return
-    entry = tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white", font=("Arial", 12), justify="center")
-    x = (event.x//taille)*taille+taille//2
+    #entry pour remplire
+    entry = tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white", font=("Arial", 12), justify="center")      
+    #pour que la window du entry soit  la meme dimension de la case
+    x = (event.x//taille)*taille+taille//2                    
     y = (event.y//taille)*taille+taille//2
     canva.create_window(x, y, window=entry, width=taille-2, height=taille-2)
     entry.focus()
@@ -96,25 +99,30 @@ def affichage_chiffre(event):
 
 def valider_chiffre(event):
     global entry
-    remplir_chiffre(entry.get())
+    #fait passer a la fonction remplir_chiffre
+    remplir_chiffre(entry.get())            
     entry.destroy()
 
 
 def remplir_chiffre(nombre):
     global taille, canva, x_ecran, y_ecran, grille, text_canva, grille_sol
+    #avoir les indice de colonnes et ligne du clic 
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
     grille[ligne][colonne] = int(nombre)
+    #couleur valide ou pas
     if grille[ligne][colonne] == grille_sol[ligne][colonne]:
         color = "green"
     else:
         color = "red"
+    #calcul taille en pixel pour trouver centre de la case
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
     x2 = x1 + taille//2
     y2 = y1 + taille//2
     if (ligne, colonne) in text_canva:
         canva.delete(text_canva[(ligne, colonne)])
+    #creation d'un texte
     text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12), fill=color)
 
 secondes = 0
@@ -164,7 +172,8 @@ boutton_quitter.grid(row=3, column=0)
 canva = tk.Canvas(fenetre, width=500, height=500, background="white")
 canva.grid(row=0, column=0, rowspan=3)
 
-nombre_ligne = 11
+#generation grille 11x11
+nombre_ligne = 11                                      
 nombre_colonne = 11
 taille = 500/nombre_colonne
 for ligne in range(1, nombre_ligne-1):
