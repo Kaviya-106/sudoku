@@ -93,7 +93,6 @@ def affichage_chiffre(event):
     x = (event.x//taille)*taille+taille//2                    
     y = (event.y//taille)*taille+taille//2
     canva.create_window(x, y, window=entry, width=taille-2, height=taille-2)
-    entry.focus()
     entry.bind("<Return>", valider_chiffre)
 
 
