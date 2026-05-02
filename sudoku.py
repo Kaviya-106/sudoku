@@ -71,7 +71,7 @@ def generer_grille():
                 x1 = (lig+1)*taille
                 y1 = (col+1)*taille
                 canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
-            text_canva[(lig , col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
+            text_canva[(lig, col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 
 def affichage_chiffre(event):
@@ -183,7 +183,6 @@ for ligne in range(1, nombre_ligne-1):
 
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
-
 btn_charger=tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal")
 btn_charger.grid(row=3, column=1)
 tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=3, column=2)
