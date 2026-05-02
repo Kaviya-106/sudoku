@@ -86,7 +86,9 @@ def affichage_chiffre(event):
         if couleur == "green":
             return
     if grille[ligne][colonne] is not None:
-        return
+        couleur = canva.itemcget(text_canva[(ligne, colonne)], "fill")
+        if couleur != "red":
+            return
     #entry pour remplire
     entry = tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white", font=("Arial", 12), justify="center")      
     #pour que la window du entry soit  la meme dimension de la case
