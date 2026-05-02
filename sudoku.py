@@ -67,7 +67,7 @@ def generer_grille():
         for col in range(9):
             x = (lig + 1.5) * taille
             y = (col + 1.5) * taille
-            if grille[lig][col] is not None:
+            if (lig + col) % 2 == 0:
                 x1 = (lig+1)*taille
                 y1 = (col+1)*taille
                 canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
