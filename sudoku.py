@@ -165,11 +165,10 @@ def annuler_reponse():
 
 def charger_sauvegarde():
 
-    global grille, grille_sol,
-    grille_depart
+    global grille, grille_sol, grille_depart
     with open("save.txt", "r") as f:
         lignes = f.readlines()
-    grille = [eval(ligne[i]strip()) for i in range(0,9)]
+    grille = [eval(lignes[i].strip()) for i in range(0,9)]
     grille_sol = [eval(lignes[i].strip()) for i in range(9, 18)]
     grille_depart = [eval(lignes[i].strip()) for i in range(18, 27)]
     for lig in range (9) :
@@ -182,7 +181,7 @@ def charger_sauvegarde():
                 y1 = (col+1) * taille
                 x = (lig + 1.5) * taille
                 y = (col + 1.5) * taille
-                if grille_depart[lig][col] is not None:
+                if (lig+col)%2 == 0:
                     canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
                     color = "black"
                 elif val == grille_sol[lig][col]:
