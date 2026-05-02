@@ -163,7 +163,16 @@ def charger_sauvegarde():
     global grille
     with open("save.txt", "r") as f:
         grille = [eval(ligne.strip()) for ligne in f ]
-
+    for lig in range (9) :
+        for col in range (9) :
+            if (lig, col) in text_canva:
+                canva.delete(text_canva[(lig,col)])
+            x = (lig+1.5)*taille
+            y = (col+1.5)*taille
+            val=grille[lig][col]
+            if val is not None :
+                color="green" if grille_depart [lig][col] is None else "black"
+                text_canva[(lig, col)] = canva.create_text (x,y, text=val, font=(12), fill = color)   
 fenetre = tk.Tk()
 fenetre.title("jeu soudoku")
 
