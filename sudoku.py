@@ -17,7 +17,7 @@ x_ecran = 0
 y_ecran = 0
 grille_sol = []
 grille_depart = []
-btn_charger=None
+btn_charger = None
 
 
 def est_possible(grille, lig, col, nombre):
