@@ -144,6 +144,11 @@ def sauvegarder():
     with open("save.txt", "w") as f :
         for ligne in grille:
             f.write(str(ligne) + "\n")
+        for ligne in grille_sol:
+            f.write(str(ligne)+"\n")
+        for ligne in grille_depart:
+            f.write(str(ligne)+"\n")
+
     messagebox.showinfo("Sauvegarde", "Partie enregistrée dans save.txt")
     btn_charger.entryconfig(state="normal")
 
@@ -160,19 +165,33 @@ def annuler_reponse():
 
 def charger_sauvegarde():
 
-    global grille
+    global grille, grille_sol,
+    grille_depart
     with open("save.txt", "r") as f:
-        grille = [eval(ligne.strip()) for ligne in f ]
+        lignes = f.readlines()
+    grille = [eval(ligne[i]strip()) for i in range(0,9)]
+    grille_sol = [eval(lignes[i].strip()) for i in range(9, 18)]
+    grille_depart = [eval(lignes[i].strip()) for i in range(18, 27)]
     for lig in range (9) :
         for col in range (9) :
             if (lig, col) in text_canva:
-                canva.delete(text_canva[(lig,col)])
-            x = (lig+1.5)*taille
-            y = (col+1.5)*taille
-            val=grille[lig][col]
-            if val is not None :
-                color="green" if grille_depart [lig][col] is None else "black"
-                text_canva[(lig, col)] = canva.create_text (x,y, text=val, font=(12), fill = color)   
+                canva.delete(text_canva[(lig, col)])
+            val = grille[lig][col]
+            if val is not None:
+                x1 = (lig+1) * taille
+                y1 = (col+1) * taille
+                x = (lig + 1.5) * taille
+                y = (col + 1.5) * taille
+                if grille_depart[lig][col] is not None:
+                    canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
+                    color = "black"
+                elif val == grille_sol[lig][col]:
+                    color = "green"
+                else:
+                    color = "red"
+                text_canva[(lig, col)] = canva.create_text(x, y, text=val, font=(12), fill=color)
+
+
 fenetre = tk.Tk()
 fenetre.title("jeu soudoku")
 
