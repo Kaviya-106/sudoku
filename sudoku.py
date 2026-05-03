@@ -1,4 +1,4 @@
-import tkinter as tk 
+import tkinter as tk
 from tkinter import messagebox
 import random
 import copy
@@ -76,8 +76,8 @@ def generer_grille():
 
 def affichage_chiffre(event):
     global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran, entry
-    #recup les event pour remplir_chiffre
-    y_ecran = event.y                                               
+    # recup les event pour remplir_chiffre
+    y_ecran = event.y
     x_ecran = event.x
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
@@ -89,10 +89,10 @@ def affichage_chiffre(event):
         couleur = canva.itemcget(text_canva[(ligne, colonne)], "fill")
         if couleur != "red":
             return
-    #entry pour remplire
-    entry = tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white", font=("Arial", 12), justify="center")      
-    #pour que la window du entry soit  la meme dimension de la case
-    x = (event.x//taille)*taille+taille//2                    
+    # entry pour remplire
+    entry = tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white", font=("Arial", 12), justify="center")
+    # pour que la window du entry soit  la meme dimension de la case
+    x = (event.x//taille)*taille+taille//2
     y = (event.y//taille)*taille+taille//2
     canva.create_window(x, y, window=entry, width=taille-2, height=taille-2)
     entry.bind("<Return>", valider_chiffre)
@@ -100,34 +100,67 @@ def affichage_chiffre(event):
 
 def valider_chiffre(event):
     global entry
-    #fait passer a la fonction remplir_chiffre
-    remplir_chiffre(entry.get())            
+    # fait passer a la fonction remplir_chiffre
+    remplir_chiffre(entry.get())
     entry.destroy()
 
 
 def remplir_chiffre(nombre):
     global taille, canva, x_ecran, y_ecran, grille, text_canva, grille_sol
-    #avoir les indice de colonnes et ligne du clic 
+    # avoir les indice de colonnes et ligne du clic
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
     grille[ligne][colonne] = int(nombre)
-    #couleur valide ou pas
+    # couleur valide ou pas
     if grille[ligne][colonne] == grille_sol[ligne][colonne]:
         color = "green"
     else:
         color = "red"
-    #calcul taille en pixel pour trouver centre de la case
+    # calcul taille en pixel pour trouver centre de la case
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
     x2 = x1 + taille//2
     y2 = y1 + taille//2
     if (ligne, colonne) in text_canva:
         canva.delete(text_canva[(ligne, colonne)])
-    #creation d'un texte
+    # creation d'un texte
     text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12), fill=color)
+
 
 secondes = 0
 label_chrono = None
+
+
+def annuler_partie():
+    dialogue = tk.Toplevel(fenetre)
+    dialogue.title("Fin de partie")
+
+    tk.Label(dialogue, text="Que souhaitez-vous faire ?",
+             font=("Arial", 12)).pack()
+
+    btn_frame = tk.Frame(dialogue)
+    btn_frame.pack()
+    
+    def nouvelle_partie():
+        global canva, nombre_colonne, nombre_ligne, grille, text_canva, secondes
+        grille = [[0] * 9 for _ in range(9)]
+        text_canva = {}
+        secondes = 0
+        canva.delete("all")
+        for ligne in range(1, nombre_ligne - 1):
+            for colonne in range(1, nombre_colonne - 1):
+                x1 = ligne * taille
+                y1 = colonne * taille
+                canva.create_rectangle(x1, y1, x1 + taille, y1 + taille)
+        label_chrono.config(text="Temps : 00:00")
+        generer_grille()
+        btn_frame.destroy()
+        dialogue.destroy()
+    tk.Button(btn_frame, text="Nouvelle partie", width=14,
+              command=nouvelle_partie, bg="#4CAF50").grid(row=0, column=0)
+    tk.Button(btn_frame, text="Quitter", width=10,
+              command=fenetre.destroy, bg="#f44336").grid(row=0, column=1)
+
 
 def maj_chrono():
     global secondes, label_chrono
@@ -137,11 +170,9 @@ def maj_chrono():
     label_chrono.after(1000, maj_chrono)
 
 
-
 def sauvegarder():
-    
-    global btn_charger 
-    with open("save.txt", "w") as f :
+    global btn_charger
+    with open("save.txt", "w") as f:
         for ligne in grille:
             f.write(str(ligne) + "\n")
         for ligne in grille_sol:
@@ -152,27 +183,27 @@ def sauvegarder():
     messagebox.showinfo("Sauvegarde", "Partie enregistrée dans save.txt")
     btn_charger.entryconfig(state="normal")
 
+
 def annuler_reponse():
-    
     global grille, grille_depart, text_canva
     if messagebox.askyesno("Reset", "Voulez-vous effacer vos réponses ?"):
         for (l, c), txt_id in list(text_canva.items()):
             # On n'efface que si la case était vide au début du jeu
-            if grille_depart[l][c] is None: 
+            if grille_depart[l][c] is None:
                 canva.delete(txt_id)
                 del text_canva[(l, c)]
                 grille[l][c] = None
 
-def charger_sauvegarde():
 
+def charger_sauvegarde():
     global grille, grille_sol, grille_depart
     with open("save.txt", "r") as f:
         lignes = f.readlines()
-    grille = [eval(lignes[i].strip()) for i in range(0,9)]
+    grille = [eval(lignes[i].strip()) for i in range(0, 9)]
     grille_sol = [eval(lignes[i].strip()) for i in range(9, 18)]
     grille_depart = [eval(lignes[i].strip()) for i in range(18, 27)]
-    for lig in range (9) :
-        for col in range (9) :
+    for lig in range(9):
+        for col in range(9):
             if (lig, col) in text_canva:
                 canva.delete(text_canva[(lig, col)])
             val = grille[lig][col]
@@ -181,8 +212,9 @@ def charger_sauvegarde():
                 y1 = (col+1) * taille
                 x = (lig + 1.5) * taille
                 y = (col + 1.5) * taille
-                if (lig+col)%2 == 0:
+                if (lig+col) % 2 == 0:
                     canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
+                if grille_depart[lig][col] is not None:
                     color = "black"
                 elif val == grille_sol[lig][col]:
                     color = "green"
@@ -200,8 +232,8 @@ boutton_quitter.grid(row=3, column=0)
 canva = tk.Canvas(fenetre, width=500, height=500, background="white")
 canva.grid(row=0, column=0, rowspan=3)
 
-#generation grille 11x11
-nombre_ligne = 11                                      
+# generation grille 11x11
+nombre_ligne = 11
 nombre_colonne = 11
 taille = 500/nombre_colonne
 for ligne in range(1, nombre_ligne-1):
@@ -212,11 +244,12 @@ for ligne in range(1, nombre_ligne-1):
 
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
-btn_charger=tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal")
+btn_charger = tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal")
 btn_charger.grid(row=3, column=1)
-tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=3, column=2)
-tk.Button(fenetre, text="Recommencer", command=annuler_reponse).grid(row=3, column=3)
-label_chrono = tk.Label(fenetre, text="Temps : 00:00", font=("Arial",12) )
+tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=0, column=1)
+tk.Button(fenetre, text="Recommencer", command=annuler_reponse).grid(row=1, column=1)
+tk.Button(fenetre, text="Annuler", command=annuler_partie).grid(row=2, column=1)
+label_chrono = tk.Label(fenetre, text="Temps : 00:00", font=("Arial", 12))
 label_chrono.grid(row=4, column=0)
 maj_chrono()
 fenetre.mainloop()
