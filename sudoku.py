@@ -198,7 +198,7 @@ def annuler_partie():
     btn_frame = tk.Frame(dialogue)
     btn_frame.pack()
     
-def nouvelle_partie():
+    def nouvelle_partie():
         global canva, nombre_colonne, nombre_ligne, grille, text_canva, secondes
         # reinitialise les variables
         grille = [[0] * 9 for _ in range(9)]
@@ -215,9 +215,9 @@ def nouvelle_partie():
         generer_grille()
         btn_frame.destroy()
         dialogue.destroy()
-tk.Button(btn_frame, text="Nouvelle partie", width=14,
+    tk.Button(btn_frame, text="Nouvelle partie", width=14,
               command=nouvelle_partie, bg="#4CAF50").grid(row=0, column=0)
-tk.Button(btn_frame, text="Quitter", width=10,
+    tk.Button(btn_frame, text="Quitter", width=10,
               command=fenetre.destroy, bg="#f44336").grid(row=0, column=1)
 
 
