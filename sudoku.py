@@ -15,6 +15,8 @@ x_sauv = 0
 y_sauv = 0
 x_ecran = 0
 y_ecran = 0
+nb_err = 0
+label_err = None
 grille_sol = []
 grille_depart = []
 btn_charger = None
@@ -84,7 +86,7 @@ def affichage_chiffre(event):
         canva.delete(h)
     highlight_ids = []
     highlight_same = []
-
+    
     # recup les event pour remplir_chiffre
     y_ecran = event.y
     x_ecran = event.x
@@ -131,10 +133,8 @@ def affichage_chiffre(event):
         couleur = canva.itemcget(text_canva[(ligne, colonne)], "fill")
         if couleur == "green":
             return
-    if grille[ligne][colonne] is not None:
-        couleur = canva.itemcget(text_canva[(ligne, colonne)], "fill")
-        if couleur != "red":
-            return
+    if grille[ligne][colonne] is not None and couleur != "red":
+        return
     # entry pour remplire
     entry = tk.Entry(canva, bd=0, relief="flat", highlightthickness=0, bg="white", font=("Arial", 12), justify="center")
     # pour que la window du entry soit  la meme dimension de la case
@@ -163,6 +163,7 @@ def remplir_chiffre(nombre):
     else:
         color = "red"
         highlight_same = []
+        nbre_erreurs()
     for l in range(9):
         for c in range(9):
             if (l, c) != (ligne, colonne) and grille[l][c] == int(nombre):
@@ -183,6 +184,12 @@ def remplir_chiffre(nombre):
     text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12), fill=color)
 
 
+def nbre_erreurs():
+    global text_canva, x_ecran, y_ecran, label_err, nb_err
+    nb_err += 1
+    label_err.config(text=f"Nombre d'erreurs : {nb_err}")
+
+
 secondes = 0
 label_chrono = None
 
@@ -198,11 +205,13 @@ def annuler_partie():
     btn_frame.pack()
 
     def nouvelle_partie():
-        global canva, nombre_colonne, nombre_ligne, grille, text_canva, secondes
+        global canva, nombre_colonne, nombre_ligne, grille, text_canva, secondes, nb_err, label_err
         # reinitialise les variables
         grille = [[0] * 9 for _ in range(9)]
         text_canva = {}
         secondes = 0
+        nb_err = 0
+        label_err.config(text="Nombre d'erreurs : 0")
         canva.delete("all")
         # créer une nouvelle grille
         for ligne in range(1, nombre_ligne - 1):
@@ -237,6 +246,8 @@ def sauvegarder():
             f.write(str(ligne)+"\n")
         for ligne in grille_depart:
             f.write(str(ligne)+"\n")
+        f.write(str(secondes) + "\n")
+        f.write(str(nb_err) + "\n")
 
     messagebox.showinfo("Sauvegarde", "Partie enregistrée dans save.txt")
     btn_charger.entryconfig(state="normal")
@@ -254,12 +265,15 @@ def annuler_reponse():
 
 
 def charger_sauvegarde():
-    global grille, grille_sol, grille_depart
+    global grille, grille_sol, grille_depart, secondes, nb_err
     with open("save.txt", "r") as f:
         lignes = f.readlines()
     grille = [eval(lignes[i].strip()) for i in range(0, 9)]
     grille_sol = [eval(lignes[i].strip()) for i in range(9, 18)]
     grille_depart = [eval(lignes[i].strip()) for i in range(18, 27)]
+    secondes = int(lignes[27].strip())
+    nb_err = int(lignes[28].strip())
+    label_err.config(text=f"Nombre d'erreurs : {nb_err}")
     for lig in range(9):
         for col in range(9):
             if (lig, col) in text_canva:
@@ -309,5 +323,8 @@ tk.Button(fenetre, text="Recommencer", command=annuler_reponse).grid(row=1, colu
 tk.Button(fenetre, text="Annuler", command=annuler_partie).grid(row=2, column=1)
 label_chrono = tk.Label(fenetre, text="Temps : 00:00", font=("Arial", 12))
 label_chrono.grid(row=4, column=0)
+label_err = tk.Label(fenetre, text="Nombre d'erreurs : 0", font=("Arial", 12))
+label_err.grid(row=5, column=0)
+
 maj_chrono()
 fenetre.mainloop()
