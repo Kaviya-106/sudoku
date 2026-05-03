@@ -113,6 +113,7 @@ def remplir_chiffre(nombre):
     colonne = int(y_ecran//taille)-1
     grille[ligne][colonne] = int(nombre)
     # couleur valide ou pas
+    
     if grille[ligne][colonne] == grille_sol[ligne][colonne]:
         color = "green"
     else:
