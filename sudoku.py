@@ -110,7 +110,7 @@ def affichage_chiffre(event):
         x1 = (l + 1) * taille
         y1 = (c + 1) * taille
         hid = canva.create_rectangle(x1, y1, x1 + taille, y1 + taille,
-                                     fill="#fffacd", outline="")
+                                     fill="#d3dee5", outline="")
         highlight_ids.append(hid)
         canva.tag_lower(hid)
 
@@ -158,7 +158,6 @@ def remplir_chiffre(nombre):
     colonne = int(y_ecran//taille)-1
     grille[ligne][colonne] = int(nombre)
     # couleur valide ou pas
-    
     if grille[ligne][colonne] == grille_sol[ligne][colonne]:
         color = "green"
     else:
@@ -197,7 +196,7 @@ def annuler_partie():
 
     btn_frame = tk.Frame(dialogue)
     btn_frame.pack()
-    
+
     def nouvelle_partie():
         global canva, nombre_colonne, nombre_ligne, grille, text_canva, secondes
         # reinitialise les variables
