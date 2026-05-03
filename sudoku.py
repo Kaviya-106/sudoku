@@ -18,6 +18,8 @@ y_ecran = 0
 grille_sol = []
 grille_depart = []
 btn_charger = None
+highlight_ids = []
+highlight_same = []
 
 
 def est_possible(grille, lig, col, nombre):
@@ -77,11 +79,54 @@ def generer_grille():
 
 def affichage_chiffre(event):
     global taille, canva, x_sauv, y_sauv, x_ecran, y_ecran, entry
+    global highlight_ids, highlight_same
+    for h in highlight_ids + highlight_same:
+        canva.delete(h)
+    highlight_ids = []
+    highlight_same = []
+
     # recup les event pour remplir_chiffre
     y_ecran = event.y
     x_ecran = event.x
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
+
+    if not (0 <= ligne < 9 and 0 <= colonne < 9):
+        return
+
+    # Surligner les cases contraintes (ligne, colonne, carré 3x3) en jaune
+    cases_contraintes = set()
+    for i in range(9):
+        cases_contraintes.add((ligne, i))
+        cases_contraintes.add((i, colonne))
+    lig0 = (ligne // 3) * 3
+    col0 = (colonne // 3) * 3
+    for i in range(3):
+        for j in range(3):
+            cases_contraintes.add((lig0 + i, col0 + j))
+    cases_contraintes.discard((ligne, colonne))
+
+    for (l, c) in cases_contraintes:
+        x1 = (l + 1) * taille
+        y1 = (c + 1) * taille
+        hid = canva.create_rectangle(x1, y1, x1 + taille, y1 + taille,
+                                     fill="#fffacd", outline="")
+        highlight_ids.append(hid)
+        canva.tag_lower(hid)
+
+    # Surligner les cases contenant le même chiffre en bleu clair
+    val_cliquee = grille[ligne][colonne]
+    if val_cliquee is not None:
+        for l in range(9):
+            for c in range(9):
+                if (l, c) != (ligne, colonne) and grille[l][c] == val_cliquee:
+                    x1 = (l + 1) * taille
+                    y1 = (c + 1) * taille
+                    hid = canva.create_rectangle(x1, y1, x1 + taille, y1 + taille,
+                                                 fill="#add8e6", outline="")
+                    highlight_same.append(hid)
+                    canva.tag_lower(hid)
+
     if (ligne, colonne) in text_canva:
         couleur = canva.itemcget(text_canva[(ligne, colonne)], "fill")
         if couleur == "green":
@@ -107,7 +152,7 @@ def valider_chiffre(event):
 
 
 def remplir_chiffre(nombre):
-    global taille, canva, x_ecran, y_ecran, grille, text_canva, grille_sol
+    global taille, canva, x_ecran, y_ecran, grille, text_canva, grille_sol, highlight_same
     # avoir les indice de colonnes et ligne du clic
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
@@ -118,6 +163,16 @@ def remplir_chiffre(nombre):
         color = "green"
     else:
         color = "red"
+        highlight_same = []
+    for l in range(9):
+        for c in range(9):
+            if (l, c) != (ligne, colonne) and grille[l][c] == int(nombre):
+                x1 = (l + 1) * taille
+                y1 = (c + 1) * taille
+                hid = canva.create_rectangle(x1, y1, x1 + taille, y1 + taille,
+                                             fill="#add8e6", outline="")
+                highlight_same.append(hid)
+                canva.tag_lower(hid)
     # calcul taille en pixel pour trouver centre de la case
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
