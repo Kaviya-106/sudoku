@@ -43,17 +43,18 @@ def remplir_grille(grille):
                 for nombre in nombres:
                     if est_possible(grille, lig, col, nombre):
                         grille[lig][col] = nombre
-                        if remplir_grille(grille):
+                        if remplir_grille(grille):  # essaie de remplir récursivement
                             return True
-                        grille[lig][col] = 0
-                return False
+                        grille[lig][col] = 0  # Si l'appel récursif ne marche pas on fait le prochain nombre
+                return False  # Aucun nombre ne larche donc on remonte pour changer celui d'avant
+    # Toutes les cases sont remplies
     return True
 
 
 def disparition_chiffres(grille, nb_trous=40):
     cases = [(lig, col) for lig in range(9) for col in range(9)]
     random.shuffle(cases)
-    for lig, col in cases[:nb_trous]:
+    for lig, col in cases[:nb_trous]:  # permet d'enlever 40 cases au hasard
         grille[lig][col] = None
 
 
@@ -67,7 +68,7 @@ def generer_grille():
         for col in range(9):
             x = (lig + 1.5) * taille
             y = (col + 1.5) * taille
-            if (lig + col) % 2 == 0:
+            if (lig + col) % 2 == 0:  # créer un damier
                 x1 = (lig+1)*taille
                 y1 = (col+1)*taille
                 canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
@@ -132,7 +133,7 @@ label_chrono = None
 
 
 def annuler_partie():
-    dialogue = tk.Toplevel(fenetre)
+    dialogue = tk.Toplevel(fenetre)  # créer une fenêtre attacher à la fenetre
     dialogue.title("Fin de partie")
 
     tk.Label(dialogue, text="Que souhaitez-vous faire ?",
@@ -143,10 +144,12 @@ def annuler_partie():
     
     def nouvelle_partie():
         global canva, nombre_colonne, nombre_ligne, grille, text_canva, secondes
+        # reinitialise les variables
         grille = [[0] * 9 for _ in range(9)]
         text_canva = {}
         secondes = 0
         canva.delete("all")
+        # créer une nouvelle grille
         for ligne in range(1, nombre_ligne - 1):
             for colonne in range(1, nombre_colonne - 1):
                 x1 = ligne * taille
