@@ -79,6 +79,7 @@ def affichage_chiffre(event):
     #recup les event pour remplir_chiffre
     y_ecran = event.y                                               
     x_ecran = event.x
+    # avoir indice de colonnes et lignes du clic 
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
     if (ligne, colonne) in text_canva:
@@ -93,13 +94,12 @@ def affichage_chiffre(event):
     x = (event.x//taille)*taille+taille//2                    
     y = (event.y//taille)*taille+taille//2
     canva.create_window(x, y, window=entry, width=taille-2, height=taille-2)
-    entry.focus()
     entry.bind("<Return>", valider_chiffre)
 
 
 def valider_chiffre(event):
     global entry
-    #fait passer a la fonction remplir_chiffre
+    #fait passer a la fonction remplir_chiffre ce qui est taper dans le entry
     remplir_chiffre(entry.get())            
     entry.destroy()
 
@@ -109,20 +109,21 @@ def remplir_chiffre(nombre):
     #avoir les indice de colonnes et ligne du clic 
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
-    grille[ligne][colonne] = int(nombre)
+    grille[ligne][colonne] = nombre
     #couleur valide ou pas
     if grille[ligne][colonne] == grille_sol[ligne][colonne]:
         color = "green"
     else:
         color = "red"
-    #calcul taille en pixel pour trouver centre de la case
+    # calcule coordonnées en pixels du coin supérieur gauche de la case
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
+    #calcul taille en pixel pour trouver centre de la case pour le texte
     x2 = x1 + taille//2
     y2 = y1 + taille//2
     if (ligne, colonne) in text_canva:
         canva.delete(text_canva[(ligne, colonne)])
-    #creation d'un texte
+    #creation du texte au centre avec le nombre du entry
     text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12), fill=color)
 
 secondes = 0
