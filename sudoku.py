@@ -75,7 +75,7 @@ def generer_grille():
             if (lig + col) % 2 == 0:  # créer un damier
                 x1 = (lig+1)*taille
                 y1 = (col+1)*taille
-                canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
+                canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#a3cea3")
             text_canva[(lig, col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 
@@ -90,6 +90,7 @@ def affichage_chiffre(event):
     # recup les event pour remplir_chiffre
     y_ecran = event.y
     x_ecran = event.x
+    # avoir indice de colonnes et lignes du clic
     ligne = int(x_ecran//taille)-1
     colonne = int(y_ecran//taille)-1
 
@@ -146,7 +147,7 @@ def affichage_chiffre(event):
 
 def valider_chiffre(event):
     global entry
-    # fait passer a la fonction remplir_chiffre
+    # fait passer a la fonction remplir_chiffre ce qui est donner dans le entry
     remplir_chiffre(entry.get())
     entry.destroy()
 
@@ -173,14 +174,15 @@ def remplir_chiffre(nombre):
                                              fill="#add8e6", outline="")
                 highlight_same.append(hid)
                 canva.tag_lower(hid)
-    # calcul taille en pixel pour trouver centre de la case
+    # calcul coordonnées en pixel du coin superieur gacuhe de la case 
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
+    #calcul taille en pixel pour trouver centre de la case pour le texte
     x2 = x1 + taille//2
     y2 = y1 + taille//2
     if (ligne, colonne) in text_canva:
         canva.delete(text_canva[(ligne, colonne)])
-    # creation d'un texte
+    # creation d'un texte au centre de la case avec le nombre du entry
     text_canva[(ligne, colonne)] = canva.create_text(x2, y2, text=nombre, font=(12), fill=color)
 
 
