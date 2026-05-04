@@ -254,8 +254,11 @@ def sauvegarder():
 
 
 def annuler_reponse():
-    global grille, grille_depart, text_canva
+    global grille, grille_depart, text_canva, secondes, nb_err
     if messagebox.askyesno("Reset", "Voulez-vous effacer vos réponses ?"):
+        secondes = 0
+        nb_err = 0
+        label_err.config(text="Nombre d'erreurs : 0")
         for (l, c), txt_id in list(text_canva.items()):
             # On n'efface que si la case était vide au début du jeu
             if grille_depart[l][c] is None:
@@ -297,12 +300,15 @@ def charger_sauvegarde():
 
 fenetre = tk.Tk()
 fenetre.title("jeu soudoku")
+fenetre.config(bg="#7e9c95")
+fenetre.geometry("680x700")
 
-boutton_quitter = tk.Button(fenetre, text='Quitter', command=fermer_fenetre)
-boutton_quitter.grid(row=3, column=0)
+
+boutton_quitter = tk.Button(fenetre, text='Quitter', command=fermer_fenetre, relief="sunken", bg="#ebc1c1")
+boutton_quitter.grid(row=15, column=0, columnspan=3)
 
 canva = tk.Canvas(fenetre, width=500, height=500, background="white")
-canva.grid(row=0, column=0, rowspan=3)
+canva.grid(row=3, column=7, rowspan=2)
 
 # generation grille 11x11
 nombre_ligne = 11
@@ -316,15 +322,17 @@ for ligne in range(1, nombre_ligne-1):
 
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
-btn_charger = tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal")
-btn_charger.grid(row=3, column=1)
-tk.Button(fenetre, text="Sauvegarder", command=sauvegarder).grid(row=0, column=1)
-tk.Button(fenetre, text="Recommencer", command=annuler_reponse).grid(row=1, column=1)
-tk.Button(fenetre, text="Annuler", command=annuler_partie).grid(row=2, column=1)
+btn_charger = tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal", bg="#d3e3d3", relief="sunken")
+btn_charger.grid(row=3, column=0)
+tk.Button(fenetre, text="Sauvegarder", command=sauvegarder, bg="#d3e3d3", relief="sunken").grid(row=1, column=11)
+tk.Button(fenetre, text="Recommencer", command=annuler_reponse, bg="#d3e3d3", relief="sunken").grid(row=1, column=0)
+tk.Button(fenetre, text="Annuler", command=annuler_partie, bg="#d3e3d3", relief="sunken").grid(row=4, column=0)
 label_chrono = tk.Label(fenetre, text="Temps : 00:00", font=("Arial", 12))
-label_chrono.grid(row=4, column=0)
+label_chrono.grid(row=16, column=5, columnspan=3)
+label_sudoku = tk.Label(fenetre, text="SUDOKU", font=("Showcard Gothic", 20, "bold"), fg="#D9BE23", bg="#7e9c95")
+label_sudoku.grid(row=0, column=5, columnspan=4)
 label_err = tk.Label(fenetre, text="Nombre d'erreurs : 0", font=("Arial", 12))
-label_err.grid(row=5, column=0)
+label_err.grid(row=19, column=5, columnspan=3)
 
 maj_chrono()
 fenetre.mainloop()
