@@ -75,7 +75,7 @@ def generer_grille():
             if (lig + col) % 2 == 0:  # créer un damier
                 x1 = (lig+1)*taille
                 y1 = (col+1)*taille
-                canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#a3cea3")
+                canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#c6dfc6")
             text_canva[(lig, col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 
