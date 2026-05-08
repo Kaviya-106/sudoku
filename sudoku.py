@@ -174,6 +174,8 @@ def remplir_chiffre(nombre):
                                              fill="#add8e6", outline="")
                 highlight_same.append(hid)
                 canva.tag_lower(hid)
+    if grille == grille_sol:
+        messagebox.showinfo("bravo vous avez gagné !")
     # calcul coordonnées en pixel du coin superieur gacuhe de la case 
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
