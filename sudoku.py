@@ -175,11 +175,11 @@ def remplir_chiffre(nombre):
                 highlight_same.append(hid)
                 canva.tag_lower(hid)
     if grille == grille_sol:
-        messagebox.showinfo("bravo vous avez gagné !")
-    # calcul coordonnées en pixel du coin superieur gacuhe de la case 
+        messagebox.showinfo(title="Victoire", message="bravo vous avez gagné ! 🎉🎉🎉")
+    # calcul coordonnées en pixel du coin superieur gauche de la case
     x1 = (ligne+1) * taille
     y1 = (colonne+1) * taille
-    #calcul taille en pixel pour trouver centre de la case pour le texte
+    # calcul taille en pixel pour trouver centre de la case pour le texte
     x2 = x1 + taille//2
     y2 = y1 + taille//2
     if (ligne, colonne) in text_canva:
