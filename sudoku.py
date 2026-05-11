@@ -340,14 +340,14 @@ nombre_colonne = 11
 taille = 500/nombre_colonne
 generer_grille()
 
-for ligne in range(1, nombre_ligne-1):
+for ligne in range(1, nombre_ligne):
     y1 = ligne*taille
     if ligne % 3 == 1:
         canva.create_line(taille, y1, 10*taille, y1, width=4)
 for colonne in range(1, nombre_colonne):
     x1 = colonne*taille
     if colonne % 3 == 1:
-        canva.create_line(x1, taille, x1, 10*taille)
+        canva.create_line(x1, taille, x1, 10*taille, width=4)
 
 canva.bind("<Button-1>", affichage_chiffre)
 btn_charger = tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal", bg="#d3e3d3", relief="sunken")
