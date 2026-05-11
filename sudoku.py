@@ -72,10 +72,12 @@ def generer_grille():
         for col in range(9):
             x = (lig + 1.5) * taille
             y = (col + 1.5) * taille
+            x1 = (lig+1)*taille
+            y1 = (col+1)*taille
             if (lig + col) % 2 == 0:  # créer un damier
-                x1 = (lig+1)*taille
-                y1 = (col+1)*taille
                 canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#c6dfc6")
+            else:
+                canva.create_rectangle(x1, y1, x1+taille, y1+taille)
             text_canva[(lig, col)] = canva.create_text(x, y, text=grille[lig][col], font=(12))
 
 
@@ -218,13 +220,16 @@ def annuler_partie():
         label_err.config(text="Nombre d'erreurs : 0")
         canva.delete("all")
         # créer une nouvelle grille
-        for ligne in range(1, nombre_ligne - 1):
-            for colonne in range(1, nombre_colonne - 1):
-                x1 = ligne * taille
-                y1 = colonne * taille
-                canva.create_rectangle(x1, y1, x1 + taille, y1 + taille)
         label_chrono.config(text="Temps : 00:00")
         generer_grille()
+        for ligne in range(1, nombre_ligne):
+            y1 = ligne*taille
+            if ligne % 3 == 1:
+                canva.create_line(1*taille, y1, 10*taille, y1, width=4)
+        for colonne in range(1, nombre_colonne):
+            x1 = colonne*taille
+            if colonne % 3 == 1:
+                canva.create_line(x1, 1*taille, x1, 10*taille, width=4)
         btn_frame.destroy()
         dialogue.destroy()
     tk.Button(btn_frame, text="Nouvelle partie", width=14,
@@ -281,18 +286,32 @@ def charger_sauvegarde():
     secondes = int(lignes[27].strip())
     nb_err = int(lignes[28].strip())
     label_err.config(text=f"Nombre d'erreurs : {nb_err}")
+    canva.delete("all")
+    text_canva = {}
     for lig in range(9):
         for col in range(9):
-            if (lig, col) in text_canva:
-                canva.delete(text_canva[(lig, col)])
+            x1 = (lig+1)*taille
+            y1 = (col+1)*taille
+            if (lig + col) % 2 == 0:
+                canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#c6dfc6")
+            else:
+                canva.create_rectangle(x1, y1, x1+taille, y1+taille)
+    for ligne in range(1, nombre_ligne):
+        y1 = ligne*taille
+        if ligne % 3 == 1:
+            canva.create_line(1*taille, y1, 10*taille, y1, width=4)
+    for colonne in range(1, nombre_colonne):
+        x1 = colonne*taille
+        if colonne % 3 == 1:
+            canva.create_line(x1, 1*taille, x1, 10*taille, width=4)
+    for lig in range(9):
+        for col in range(9):
             val = grille[lig][col]
             if val is not None:
                 x1 = (lig+1) * taille
                 y1 = (col+1) * taille
                 x = (lig + 1.5) * taille
                 y = (col + 1.5) * taille
-                if (lig+col) % 2 == 0:
-                    canva.create_rectangle(x1, y1, x1+taille, y1+taille, fill="#d3e3d3")
                 if grille_depart[lig][col] is not None:
                     color = "black"
                 elif val == grille_sol[lig][col]:
@@ -314,18 +333,24 @@ boutton_quitter.grid(row=15, column=0, columnspan=3)
 canva = tk.Canvas(fenetre, width=500, height=500, background="white")
 canva.grid(row=3, column=7, rowspan=2)
 
+
 # generation grille 11x11
 nombre_ligne = 11
 nombre_colonne = 11
 taille = 500/nombre_colonne
-for ligne in range(1, nombre_ligne-1):
-    for colonne in range(1, nombre_colonne-1):
-        x1 = ligne*taille
-        y1 = colonne*taille
-        canva.create_rectangle(x1, y1, x1+taille, y1+taille)
+
+generer_grille()
+
+for ligne in range(1, nombre_ligne):
+    y1 = ligne*taille
+    if ligne % 3 == 1:
+        canva.create_line(1*taille, y1, 10*taille, y1, width=4)
+for colonne in range(1, nombre_colonne):
+    x1 = colonne*taille
+    if colonne % 3 == 1:
+        canva.create_line(x1, 1*taille, x1, 10*taille, width=4)
 
 canva.bind("<Button-1>", affichage_chiffre)
-generer_grille()
 btn_charger = tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal", bg="#d3e3d3", relief="sunken")
 btn_charger.grid(row=3, column=0)
 tk.Button(fenetre, text="Sauvegarder", command=sauvegarder, bg="#d3e3d3", relief="sunken").grid(row=1, column=11)
