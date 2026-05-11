@@ -314,8 +314,19 @@ for ligne in range(1, nombre_ligne-1):
     for colonne in range(1, nombre_colonne-1):
         x1 = ligne*taille
         y1 = colonne*taille
-        canva.create_rectangle(x1, y1, x1+taille, y1+taille)
+        rect_petit = canva.create_rectangle(x1, y1, x1+taille, y1+taille)
+for ligne in range(1, nombre_ligne-1):
+    for colonne in range (1, nombre_colonne-1):
+        x1 = ligne*taille
+        y1 = colonne*taille
+        if ligne % 3 == 1 and colonne % 3 == 1 :
+             rect_bordure = canva.create_rectangle(x1-2.5, y1-2.5, x1+taille*3+2.5, y1+taille*3+, width=5)
 
+
+
+
+canva.tag_raise(rect_bordure)
+canva.tag_lower(rect_petit)
 canva.bind("<Button-1>", affichage_chiffre)
 generer_grille()
 btn_charger = tk.Button(fenetre, text="Charger", command=charger_sauvegarde, state="normal")
